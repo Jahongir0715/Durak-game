@@ -3,30 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Игра Дурак</title>
+  <title>Игра Дурак - Сетевая версия</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   <div id="game-container">
     <h1>Игра Дурак</h1>
     <button id="start-game-btn">Начать игру</button>
-
-    <div id="deck-container">
-      <h3>Колода</h3>
-      <div id="deck" title="Колода карт">🂠</div>
-      <button id="take-card-btn" disabled>Взять карту</button>
-    </div>
-
     <div id="trump-suit"></div>
+
+    <h3>Ваша рука:</h3>
+    <div id="player-hand"></div>
+
+    <h3>Карты бота / оппонента:</h3>
+    <div id="bot-hand"></div>
 
     <h3>Стол (ход):</h3>
     <div id="battlefield"></div>
 
-    <h3>Карты бота:</h3>
-    <div id="bot-hand" class="hand"></div>
-
-    <h3>Ваша рука:</h3>
-    <div id="player-hand" class="hand"></div>
+    <h3>Ход оппонента:</h3>
+    <div id="bot-move"></div>
 
     <div id="game-log"></div>
   </div>
@@ -34,4 +31,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-<script src="/socket.io/socket.io.js"></script>
