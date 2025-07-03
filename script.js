@@ -66,4 +66,39 @@ function renderHand() {
       }
       playCard(idx);
     };
-   
+    playerHandDiv.appendChild(cardDiv);
+  });
+}
+
+function renderBattlefield(battlefield) {
+  battlefieldDiv.innerHTML = '';
+  battlefield.forEach(({ playerId: pid, card }) => {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    cardDiv.innerHTML = `${card.rank}<br>${suitsIcons[card.suit]}`;
+    if (pid === playerId) {
+      cardDiv.style.border = '2px solid green';
+    } else {
+      cardDiv.style.border = '2px solid red';
+    }
+    battlefieldDiv.appendChild(cardDiv);
+  });
+}
+
+function playCard(index) {
+  const card = playerHand[index];
+  socket.emit('play_card', { roomId: null, card }); // roomId не нужен, сервер знает комнату по сокету
+}
+
+function updateTurnStatus() {
+  if (turn === playerId) {
+    statusDiv.textContent = 'Ваш ход!';
+  } else {
+    statusDiv.textContent = 'Ход соперника...';
+  }
+}
+
+function disableAll() {
+  playerHandDiv.innerHTML = '';
+  battlefieldDiv.innerHTML = '';
+}
