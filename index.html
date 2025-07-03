@@ -1,33 +1,221 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Игра Дурак - Сетевая версия</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="/socket.io/socket.io.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Дурак Онлайн</title>
+
+<style>
+  /* Общие стили */
+  body {
+    margin: 0; padding: 0; background: #2b2b2b;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  #game-container {
+    width: 95vw;
+    max-width: 1200px;
+    padding: 20px;
+    background: #333;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #0008 inset;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 0 0 10px 0;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #008CBA;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  button:hover:not(:disabled) {
+    background-color: #005f75;
+  }
+  button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+  }
+
+  /* Колода и козырь */
+  #deck-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  #deck, #trump {
+    width: 60px;
+    height: 90px;
+    border-radius: 8px;
+    background-color: #444;
+    box-shadow: 0 2px 5px #0009;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: white;
+  }
+  #deck {
+    background-image: linear-gradient(135deg, #222, #444);
+  }
+  #trump {
+    border: 3px solid gold;
+  }
+
+  /* Руки игроков */
+  .hand-container {
+    background: #222;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-height: 100px;
+  }
+
+  .card {
+    width: 60px;
+    height: 90px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px #0006;
+    color: black;
+    font-weight: 700;
+    font-size: 1.2rem;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    position: relative;
+  }
+  .card.red {
+    color: #d00;
+  }
+  .card:hover {
+    transform: translateY(-15px) scale(1.05);
+    box-shadow: 0 5px 15px #000a;
+    z-index: 10;
+  }
+
+  .card .top-left, .card .bottom-right {
+    font-size: 1rem;
+  }
+  .card .bottom-right {
+    transform: rotate(180deg);
+    align-self: flex-end;
+  }
+
+  /* Стол */
+  #battlefield {
+    background: #1e1e1e;
+    border-radius: 12px;
+    min-height: 120px;
+    padding: 15px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Лог игры */
+  #game-log {
+    height: 80px;
+    background: #111;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 1rem;
+    overflow-y: auto;
+    box-shadow: inset 0 0 8px #000a;
+  }
+
+  /* Сетка для разных областей */
+  #players-area {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  #bot-area, #player-area {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #bot-area {
+    align-items: center;
+  }
+  #player-area {
+    align-items: center;
+  }
+
+  /* Анимация для карты на стол */
+  @keyframes moveUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-50px); opacity: 1; }
+  }
+  .move-up {
+    animation: moveUp 0.4s ease forwards;
+  }
+
+</style>
+
 </head>
 <body>
-  <div id="game-container">
-    <h1>Игра Дурак</h1>
-    <button id="start-game-btn">Начать игру</button>
-    <div id="trump-suit"></div>
 
-    <h3>Ваша рука:</h3>
-    <div id="player-hand"></div>
+<div id="game-container">
+  <h1>Игра Дурак Онлайн</h1>
 
-    <h3>Карты бота / оппонента:</h3>
-    <div id="bot-hand"></div>
-
-    <h3>Стол (ход):</h3>
-    <div id="battlefield"></div>
-
-    <h3>Ход оппонента:</h3>
-    <div id="bot-move"></div>
-
-    <div id="game-log"></div>
+  <div id="deck-container">
+    <div id="deck" title="Колода (нажми, чтобы взять карту)">🂠</div>
+    <div id="trump" title="Козырь"></div>
   </div>
 
-  <script src="script.js"></script>
+  <div id="players-area">
+    <div id="bot-area">
+      <h3>Карты бота</h3>
+      <div id="bot-hand" class="hand-container"></div>
+    </div>
+
+    <div id="battlefield"></div>
+
+    <div id="player-area">
+      <h3>Ваша рука</h3>
+      <div id="player-hand" class="hand-container"></div>
+    </div>
+  </div>
+
+  <button id="start-game-btn">Начать игру</button>
+
+  <div id="game-log" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>
