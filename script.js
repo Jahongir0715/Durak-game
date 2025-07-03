@@ -1,42 +1,69 @@
 const socket = io();
 
-let roomId = null;
+const suitsIcons = {
+  hearts: '♥',
+  diamonds: '♦',
+  clubs: '♣',
+  spades: '♠',
+};
 
-socket.on('waiting', () => {
-  alert('Ожидаем второго игрока...');
+let playerId = null;
+let trump = null;
+let playerHand = [];
+let turn = null;
+
+const statusDiv = document.getElementById('status');
+const trumpSpan = document.querySelector('#trump span');
+const battlefieldDiv = document.getElementById('battlefield');
+const playerHandDiv = document.getElementById('player-hand');
+
+socket.on('waiting', (msg) => {
+  statusDiv.textContent = msg;
 });
 
 socket.on('game_start', (data) => {
-  roomId = data.roomId;
-  console.log(`Игра началась. Ты — ${data.yourId}`);
-  startGame();
+  statusDiv.textContent = 'Игра началась!';
+  playerId = socket.id;
+  trump = data.trump;
+  playerHand = data.hands[playerId];
+  turn = data.turn;
+
+  trumpSpan.textContent = suitsIcons[trump.suit];
+
+  renderHand();
+  renderBattlefield([]);
+  updateTurnStatus();
 });
 
-function playCard(index) {
-  const card = playerHand[index];
+socket.on('update', (data) => {
+  playerHand = data.hands[playerId];
+  turn = data.turn;
 
-  // отправляем ход на сервер
-  socket.emit('play_card', {
-    roomId,
-    card,
-  });
-
-  // отображаем карту у себя
-  const field = document.getElementById('battlefield');
-  const cardDiv = document.createElement('div');
-  cardDiv.className = 'card';
-  cardDiv.innerHTML = `${card.rank}<br>${card.suit[0].toUpperCase()}`;
-  field.appendChild(cardDiv);
-
-  playerHand.splice(index, 1);
-  renderPlayerHand();
-}
-
-socket.on('opponent_card', (card) => {
-  const field = document.getElementById('battlefield');
-  const cardDiv = document.createElement('div');
-  cardDiv.className = 'card';
-  cardDiv.innerHTML = `${card.rank}<br>${card.suit[0].toUpperCase()}`;
-  cardDiv.style.backgroundColor = '#ffe'; // визуально отличим
-  field.appendChild(cardDiv);
+  renderHand();
+  renderBattlefield(data.battlefield);
+  updateTurnStatus();
 });
+
+socket.on('player_disconnect', (id) => {
+  statusDiv.textContent = `Игрок ${id} отключился. Игра завершена.`;
+  disableAll();
+});
+
+socket.on('error_msg', (msg) => {
+  alert(msg);
+});
+
+function renderHand() {
+  playerHandDiv.innerHTML = '';
+  playerHand.forEach((card, idx) => {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    cardDiv.innerHTML = `${card.rank}<br>${suitsIcons[card.suit]}`;
+    cardDiv.onclick = () => {
+      if (turn !== playerId) {
+        alert('Сейчас не ваш ход!');
+        return;
+      }
+      playCard(idx);
+    };
+   
