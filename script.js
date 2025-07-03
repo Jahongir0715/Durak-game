@@ -358,3 +358,255 @@ document.getElementById('game-container').innerHTML = `
 `;
 
 renderGame();
+const suits = ['♠', '♥', '♦', '♣'];
+const ranks = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+function createDeck() {
+  const deck = [];
+  for (const suit of suits) {
+    for (const rank of ranks) {
+      deck.push({ suit, rank });
+    }
+  }
+  return deck;
+}
+
+function shuffle(deck) {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+}
+
+const deck = createDeck();
+shuffle(deck);
+
+let playerHand = deck.splice(0, 6);
+let botHand = deck.splice(0, 6);
+
+const trumpCard = deck[deck.length - 1];
+const trumpSuit = trumpCard.suit;
+
+let tableCards = []; // Массив пар {attack: карта, defense: карта или null}
+
+let playerTurn = true; // true — ход игрока (атакует), false — ход бота
+
+// Помощь — ранжируем карты
+function rankValue(rank) {
+  return ranks.indexOf(rank);
+}
+
+// Проверка, может ли отбить defenseCard карту attackCard
+function canBeat(attackCard, defenseCard) {
+  if (defenseCard.suit === attackCard.suit) {
+    return rankValue(defenseCard.rank) > rankValue(attackCard.rank);
+  }
+  if (defenseCard.suit === trumpSuit && attackCard.suit !== trumpSuit) {
+    return true;
+  }
+  return false;
+}
+
+// Обновляем интерфейс игры
+function renderGame() {
+  const container = document.getElementById('game-container');
+  container.innerHTML = `
+    <h2>Козырь: ${trumpCard.rank}${trumpCard.suit}</h2>
+
+    <h3>Ваша рука:</h3>
+    <div id="player-hand"></div>
+
+    <h3>Карты бота:</h3>
+    <div id="bot-hand"></div>
+
+    <h3>Карты на столе:</h3>
+    <div id="table-cards"></div>
+
+    <button id="end-turn-btn" style="margin-top:20px;">Закончить ход</button>
+  `;
+
+  renderPlayerHand();
+  renderBotHand();
+  renderTable();
+
+  document.getElementById('end-turn-btn').onclick = endTurn;
+}
+
+function renderPlayerHand() {
+  const container = document.getElementById('player-hand');
+  container.innerHTML = '';
+  playerHand.forEach((card, index) => {
+    const cardElem = document.createElement('div');
+    cardElem.className = 'card';
+    cardElem.textContent = card.rank + card.suit;
+    cardElem.onclick = () => onPlayerCardClick(index);
+    container.appendChild(cardElem);
+  });
+}
+
+function renderBotHand() {
+  const container = document.getElementById('bot-hand');
+  container.innerHTML = '';
+  botHand.forEach(() => {
+    const cardElem = document.createElement('div');
+    cardElem.className = 'card bot-card';
+    container.appendChild(cardElem);
+  });
+}
+
+function renderTable() {
+  const container = document.getElementById('table-cards');
+  container.innerHTML = '';
+  tableCards.forEach(pair => {
+    const pairDiv = document.createElement('div');
+    pairDiv.className = 'table-pair';
+
+    const attackDiv = document.createElement('div');
+    attackDiv.className = 'card';
+    attackDiv.textContent = pair.attack.rank + pair.attack.suit;
+    pairDiv.appendChild(attackDiv);
+
+    if (pair.defense) {
+      const defenseDiv = document.createElement('div');
+      defenseDiv.className = 'card';
+      defenseDiv.textContent = pair.defense.rank + pair.defense.suit;
+      pairDiv.appendChild(defenseDiv);
+    }
+
+    container.appendChild(pairDiv);
+  });
+}
+
+// Обработка клика игрока по карте
+function onPlayerCardClick(cardIndex) {
+  const selectedCard = playerHand[cardIndex];
+
+  if (playerTurn) {
+    // Игрок атакует — кладём карту на стол
+    if (tableCards.length === 0 || tableCards.some(pair => pair.attack.rank === selectedCard.rank || (pair.defense && pair.defense.rank === selectedCard.rank))) {
+      tableCards.push({ attack: selectedCard, defense: null });
+      playerHand.splice(cardIndex, 1);
+      renderGame();
+
+      setTimeout(botDefend, 500);
+      playerTurn = false;
+    } else {
+      alert('Можно класть карты только с рангом, который уже на столе');
+    }
+  } else {
+    // Игрок должен отбиваться — выбирает карту для защиты
+    let undefended = tableCards.find(pair => pair.defense === null);
+    if (!undefended) {
+      alert('Нет карт для защиты');
+      return;
+    }
+    if (canBeat(undefended.attack, selectedCard)) {
+      undefended.defense = selectedCard;
+      playerHand.splice(cardIndex, 1);
+      renderGame();
+
+      setTimeout(botAttackOrFinish, 500);
+    } else {
+      alert('Эта карта не может отбить карту на столе');
+    }
+  }
+}
+
+// Ход бота — пытается отбиться
+function botDefend() {
+  let undefended = tableCards.find(pair => pair.defense === null);
+  if (!undefended) {
+    // Все карты отбиты — ход игрока на добор или атака
+    refillHands();
+    alert('Бот отбился! Ваш ход.');
+    playerTurn = true;
+    renderGame();
+    return;
+  }
+
+  // Ищем карту бота, чтобы отбить undefended.attack
+  const defendCard = botHand.find(c => canBeat(undefended.attack, c));
+  if (defendCard) {
+    undefended.defense = defendCard;
+    botHand.splice(botHand.indexOf(defendCard), 1);
+    renderGame();
+
+    setTimeout(playerAttackOrFinish, 500);
+  } else {
+    // Бот не может отбиться — забирает все карты
+    botHand.push(...tableCards.filter(pair => pair.attack).map(pair => pair.attack));
+    botHand.push(...tableCards.filter(pair => pair.defense).map(pair => pair.defense));
+    tableCards = [];
+    refillHands();
+    alert('Бот не смог отбиться и забирает карты. Ваш ход снова.');
+    playerTurn = true;
+    renderGame();
+  }
+}
+
+// После отбивания бот может атаковать если есть карты с рангом уже на столе (расширение правил)
+function botAttackOrFinish() {
+  // Найдем все ранги на столе
+  let ranksOnTable = tableCards.flatMap(pair => [pair.attack.rank, pair.defense?.rank]).filter(Boolean);
+
+  // Ищем карту у бота, которая совпадает по рангу с картами на столе
+  let attackCard = botHand.find(card => ranksOnTable.includes(card.rank));
+  if (attackCard && playerHand.length > 0) {
+    tableCards.push({ attack: attackCard, defense: null });
+    botHand.splice(botHand.indexOf(attackCard), 1);
+    playerTurn = false;
+    renderGame();
+    setTimeout(botDefend, 500);
+  } else {
+    // Бот заканчивает ход
+    refillHands();
+    alert('Ход бота завершён. Ваш ход.');
+    playerTurn = true;
+    renderGame();
+  }
+}
+
+// После игрока отбился, он может положить карту или закончить ход
+function playerAttackOrFinish() {
+  // Аналогично бот атакует, но для простоты оставим так — ход за игроком
+  alert('Ваш ход: атакуйте или закончите ход кнопкой.');
+  playerTurn = true;
+}
+
+// Обработка нажатия кнопки "Закончить ход"
+function endTurn() {
+  if (!playerTurn) {
+    alert('Сейчас ход бота, подождите.');
+    return;
+  }
+  if (tableCards.some(pair => pair.defense === null)) {
+    alert('Вы должны отбиться от всех карт или продолжать атаку');
+    return;
+  }
+  tableCards = [];
+  refillHands();
+  playerTurn = false;
+  renderGame();
+  setTimeout(botAttack, 500);
+}
+
+// Ход бота на атаку (начало хода)
+function botAttack() {
+  if (botHand.length === 0) {
+    alert('Бот выиграл!');
+    resetGame();
+    return;
+  }
+  // Бот выбирает самую слабую карту для атаки
+  let attackCard = botHand.reduce((minCard, card) => {
+    if (!minCard) return card;
+    if (card.suit === trumpSuit && minCard.suit !== trumpSuit) return minCard;
+    if (card.suit !== trumpSuit && minCard.suit === trumpSuit) return card;
+    return rankValue(card.rank) < rankValue(minCard.rank) ? card : minCard;
+  }, null);
+
+  tableCards.push({ attack: attackCard, defense: null });
+  botHand.splice(botHand.indexOf(attackCard), 1);
+  renderGame();
+
+  alert('Бот атакует. Ваша очередь отбиваться
