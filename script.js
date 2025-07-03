@@ -1,4 +1,4 @@
-// === Элементы интерфейса ===
+const battlefieldDiv = document.getElementById('battlefield');// === Элементы интерфейса ===
 const playerHandDiv = document.getElementById('player-hand');
 const botHandDiv = document.getElementById('bot-hand');
 const trumpSuitDiv = document.getElementById('trump-suit');
