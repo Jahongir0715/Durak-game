@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Игра Дурак</title>
+  <title>Дурак — Полноценная игра</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="game-container">
     <h1>Игра Дурак</h1>
+
     <button id="start-game-btn">Начать игру</button>
 
-    <div id="trump-suit"></div>
+    <div id="trump-container">
+      <div id="deck" class="card back">🂠</div>
+      <div id="trump-card" class="card"></div>
+    </div>
 
-    <h3>Карты бота:</h3>
-    <div id="bot-hand" class="hand top-hand"></div>
-
-    <h3>Стол (ход):</h3>
     <div id="battlefield"></div>
 
-    <h3>Ваша рука:</h3>
+    <div id="bot-hand" class="hand top-hand"></div>
+
     <div id="player-hand" class="hand bottom-hand"></div>
 
     <div id="game-log"></div>
