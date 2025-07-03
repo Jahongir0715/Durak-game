@@ -4,6 +4,7 @@ const botHandDiv = document.getElementById('bot-hand');
 const trumpSuitDiv = document.getElementById('trump-suit');
 const gameLogDiv = document.getElementById('game-log');
 const startBtn = document.getElementById('start-game-btn');
+const botMoveDiv = document.getElementById('bot-move');
 
 // === Данные игры ===
 const suits = ['♠', '♥', '♦', '♣'];
@@ -50,6 +51,7 @@ function startGame() {
   trumpSuitDiv.textContent = `Козырь: ${trumpCard.rank}${trumpCard.suit}`;
   renderHand(playerHand, playerHandDiv, false, playerPlayCard);
   renderHand(botHand, botHandDiv, true);
+  botMoveDiv.innerHTML = '';
   gameLogDiv.textContent = 'Игра началась! Ваш ход.';
 }
 
@@ -61,10 +63,18 @@ function playerPlayCard(index) {
   setTimeout(() => botPlay(card), 1000);
 }
 
-// Ход бота (заглушка)
+// Ход бота
 function botPlay(playerCard) {
   const botCard = botHand.shift();
   renderHand(botHand, botHandDiv, true);
+
+  // Показываем карту хода бота
+  botMoveDiv.innerHTML = '';
+  const botCardElem = document.createElement('div');
+  botCardElem.className = 'card';
+  botCardElem.textContent = botCard.rank + botCard.suit;
+  botMoveDiv.appendChild(botCardElem);
+
   gameLogDiv.textContent = `Бот ответил: ${botCard.rank}${botCard.suit}. Ваш ход снова.`;
 }
 
