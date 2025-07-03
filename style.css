@@ -28,3 +28,44 @@ body {
   background-color: #4169e1;
 }
 
+.card {
+  display: inline-block;
+  border: 1px solid white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin: 5px;
+  font-size: 24px;
+  background: #2153b1;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s;
+  width: 60px;
+  height: 90px;
+  line-height: 90px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 0 5px #0008;
+}
+
+.card:hover {
+  background-color: #4169e1;
+}
+
+.card.bot-card {
+  background: linear-gradient(45deg, #444 0%, #222 100%);
+  cursor: default;
+  color: transparent;
+  box-shadow: none;
+  position: relative;
+}
+
+.card.bot-card::after {
+  content: "🂠";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  color: #ccc;
+}
