@@ -69,3 +69,21 @@ body {
   font-size: 30px;
   color: #ccc;
 }
+#table-cards {
+  margin: 20px auto;
+  max-width: 600px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.table-pair {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.table-pair .card {
+  margin: 3px 0;
+}
