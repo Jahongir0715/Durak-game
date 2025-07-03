@@ -1,32 +1,36 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Дурак — Полноценная игра</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="game-container">
-    <h1>Игра Дурак</h1>
+const battlefieldDiv = document.getElementById('battlefield');
 
-    <button id="start-game-btn">Начать игру</button>
+function addBattlePair(attackCard, defenseCard = null) {
+  const pairDiv = document.createElement('div');
+  pairDiv.className = 'battle-pair';
 
-    <div id="trump-container">
-      <div id="deck" class="card back">🂠</div>
-      <div id="trump-card" class="card"></div>
-    </div>
+  const attackEl = document.createElement('div');
+  attackEl.className = 'battle-card attack-card';
+  attackEl.textContent = attackCard.rank + attackCard.suit;
+  if (attackCard.suit === '♥' || attackCard.suit === '♦') attackEl.classList.add('red');
 
-    <div id="battlefield"></div>
+  pairDiv.appendChild(attackEl);
 
-    <div id="bot-hand" class="hand top-hand"></div>
+  if (defenseCard) {
+    const defenseEl = document.createElement('div');
+    defenseEl.className = 'battle-card defense-card';
+    defenseEl.textContent = defenseCard.rank + defenseCard.suit;
+    if (defenseCard.suit === '♥' || defenseCard.suit === '♦') defenseEl.classList.add('red');
+    pairDiv.appendChild(defenseEl);
+  }
 
-    <div id="player-hand" class="hand bottom-hand"></div>
+  battlefieldDiv.appendChild(pairDiv);
+}
 
-    <div id="game-log"></div>
-  </div>
+// В playerPlayCard и botPlay добавлять карты так:
 
-  <script src="script.js"></script>
-</body>
-</html>
-<div id="gameLog"></div>
+// При ходе игрока:
+addBattlePair(card); // карта игрока
+
+// При ходе бота:
+const lastPair = battlefieldDiv.lastElementChild;
+const defenseCardEl = document.createElement('div');
+defenseCardEl.className = 'battle-card defense-card';
+defenseCardEl.textContent = botCard.rank + botCard.suit;
+// добавить класс red, если нужно
+lastPair.appendChild(defenseCardEl);
