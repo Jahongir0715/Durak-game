@@ -1,0 +1,40 @@
+body {
+  font-family: Arial, sans-serif;
+  background: green;
+  color: white;
+  text-align: center;
+}
+
+#game {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#hand {
+  margin-top: 20px;
+}
+
+.card {
+  display: inline-block;
+  background: white;
+  color: black;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin: 5px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: bold;
+  font-size: 20px;
+  min-width: 40px;
+  text-align: center;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.card:hover {
+  background: #ddd;
+}
+
+#table {
+  margin-top: 30px;
+  min-height: 60px;
+}
