@@ -40,3 +40,15 @@ server.listen(PORT, () => {
 const path = require('path');
 
 app.use(express.static(path.join(__dirname, '..')));
+io.on('connection', (socket) => {
+  console.log('A user connected: ' + socket.id);
+
+  socket.on('chat message', (msg) => {
+    console.log('message: ' + msg);
+    io.emit('chat message', msg); // отправляем всем подключенным
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected: ' + socket.id);
+  });
+});
