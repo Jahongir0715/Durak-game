@@ -1,70 +1,55 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Дурак Онлайн</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="game-container">
+// server.js
 
-    <header>
-      <h1>🃏 Дурак Онлайн</h1>
-    </header>
-
-    <div class="game-board">
-      <!-- Верхняя часть: противник -->
-      <section class="opponent-area">
-        <h2>Противник</h2>
-        <div id="opponent-hand" class="card-row"></div>
-      </section>
-
-      <!-- Игровое поле -->
-      <section class="battlefield-area">
-        <div class="deck-info">
-          <div id="deck" class="deck">🂠</div>
-          <div id="trump-card" class="trump-card">Козырь: ?</div>
-        </div>
-
-        <div id="battlefield" class="battlefield">
-          <!-- сюда кладутся карты атаки/защиты -->
-        </div>
-
-        <div id="controls" class="controls">
-          <button id="pass-btn" disabled>Бито</button>
-          <button id="take-btn" disabled>Беру</button>
-        </div>
-      </section>
-
-      <!-- Нижняя часть: игрок -->
-      <section class="player-area">
-        <h2>Вы</h2>
-        <div id="player-hand" class="card-row"></div>
-      </section>
-    </div>
-
-    <!-- Сообщения -->
-    <div id="game-log" class="game-log">Ожидание подключения...</div>
-  </div>
-
-  <!-- Подключаем socket.io и скрипт -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
 const express = require('express');
-const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const http = require('http');
+const { Server } = require('socket.io');
 
-app.use(express.static(__dirname)); // чтобы отдавать все файлы из корня проекта
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const PORT = process.env.PORT || 3000;
+
+let waitingPlayer = null;
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
-  // здесь потом логика игры и обмена событиями
+  console.log(`👤 Игрок подключился: ${socket.id}`);
+
+  if (waitingPlayer) {
+    const roomId = `${waitingPlayer.id}-${socket.id}`;
+    socket.join(roomId);
+    waitingPlayer.join(roomId);
+
+    // Отправляем обоим сигнал о начале игры
+    io.to(roomId).emit('game_start', {
+      roomId,
+      players: [waitingPlayer.id, socket.id],
+      yourId: socket.id
+    });
+
+    console.log(`🎮 Началась игра между ${waitingPlayer.id} и ${socket.id}`);
+    waitingPlayer = null;
+  } else {
+    waitingPlayer = socket;
+    socket.emit('waiting');
+    console.log(`🕐 Ожидание второго игрока...`);
+  }
+
+  socket.on('play_card', (data) => {
+    // Отправляем карту второму игроку
+    socket.to(data.roomId).emit('opponent_card', data.card);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`❌ Игрок отключился: ${socket.id}`);
+    if (waitingPlayer && waitingPlayer.id === socket.id) {
+      waitingPlayer = null;
+    }
+  });
 });
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+app.use(express.static('public')); // если хранишь index.html там
+
+server.listen(PORT, () => {
+  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
 });
