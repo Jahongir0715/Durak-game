@@ -1,78 +1,52 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #0b3d91;
-  color: white;
-  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #2c3e50;
+  color: #ecf0f1;
+  display: flex;
+  justify-content: center;
   padding: 20px;
 }
 
 #game-container {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  user-select: none;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  cursor: pointer;
+.hand {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  gap: 8px;
+  min-height: 100px;
+}
+
+.top-hand {
+  flex-wrap: nowrap;
+  transform: translateY(0);
+}
+
+.bottom-hand {
+  flex-wrap: nowrap;
+  transform: translateY(0);
 }
 
 .card {
-  display: inline-block;
-  border: 1px solid white;
-  border-radius: 8px;
-  padding: 10px 15px;
-  margin: 5px;
-  font-size: 24px;
-  background: #2153b1;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s;
-}
-
-.card:hover {
-  background-color: #4169e1;
-}
-
-#player-hand, #bot-hand {
-  margin-top: 20px;
-}
-
-#game-log {
-  margin-top: 30px;
-  min-height: 50px;
-}
-body {
-  font-family: Arial, sans-serif;
-  background: #0b3d91;
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-#game-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.card {
-  display: inline-block;
-  width: 60px;
-  height: 90px;
-  border-radius: 10px;
-  border: 2px solid white;
-  margin: 5px;
-  font-size: 24px;
-  line-height: 90px;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
   background: white;
+  border-radius: 6px;
+  width: 50px;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
   color: black;
-  position: relative;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  user-select: none;
 }
 
 .card.red {
@@ -81,56 +55,30 @@ body {
 
 .card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.8);
 }
 
-#player-hand, #bot-hand, #battlefield {
-  min-height: 100px;
-  margin-top: 10px;
-  padding: 10px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
-}
-
-#bot-hand .card {
-  cursor: default;
-}
-
-#game-log {
-  margin-top: 20px;
-  min-height: 40px;
-  font-size: 18px;
-  font-weight: bold;
-}
-@keyframes move-to-battlefield {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-    z-index: 10;
-  }
-  100% {
-    transform: translate(0, -120px) scale(1.2);
-    opacity: 1;
-    z-index: 10;
-  }
+#battlefield {
+  min-height: 120px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0;
+  position: relative;
 }
 
 .battle-card {
-  position: relative;
-  display: inline-block;
-  margin: 0 5px;
-  font-size: 24px;
-  width: 60px;
-  height: 90px;
-  border-radius: 10px;
-  border: 2px solid white;
-  line-height: 90px;
-  text-align: center;
+  width: 50px;
+  height: 70px;
+  border-radius: 6px;
   background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
   color: black;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
-  user-select: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  position: relative;
 }
 
 .battle-card.red {
@@ -138,5 +86,21 @@ body {
 }
 
 .move-up {
-  animation: move-to-battlefield 0.5s forwards;
+  animation: moveUp 0.4s ease forwards;
+}
+
+@keyframes moveUp {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-50px); opacity: 1; }
+}
+
+#trump-suit {
+  font-size: 22px;
+  margin: 15px 0;
+}
+
+#game-log {
+  min-height: 30px;
+  margin-top: 15px;
+  font-weight: 600;
 }
