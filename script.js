@@ -83,3 +83,12 @@ startBtn.onclick = startGame;
 const battlefieldDiv = document.getElementById('battlefield');
 
 let battlefieldCards = [];  // карты, на столе сейчас
+function renderBattlefield() {
+  battlefieldDiv.innerHTML = '';
+  battlefieldCards.forEach(card => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.textContent = card.rank + card.suit;
+    battlefieldDiv.appendChild(el);
+  });
+}
