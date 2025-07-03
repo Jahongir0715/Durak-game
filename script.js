@@ -205,3 +205,29 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const PORT = 3000;
+
+// Раздаём статику (HTML, CSS, JS)
+app.use(express.static('public'));
+
+// События подключения WebSocket
+io.on('connection', (socket) => {
+  console.log('Новое подключение:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('Отключился:', socket.id);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Сервер запущен: http://localhost:${PORT}`);
+});
+
