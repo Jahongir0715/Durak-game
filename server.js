@@ -53,3 +53,18 @@
   <script src="script.js"></script>
 </body>
 </html>
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+app.use(express.static(__dirname)); // чтобы отдавать все файлы из корня проекта
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  // здесь потом логика игры и обмена событиями
+});
+
+http.listen(3000, () => {
+  console.log('listening on *:3000');
+});
