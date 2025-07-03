@@ -1,36 +1,36 @@
-const battlefieldDiv = document.getElementById('battlefield');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Игра Дурак</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <h1>Игра Дурак</h1>
+    <button id="start-game-btn">Начать игру</button>
 
-function addBattlePair(attackCard, defenseCard = null) {
-  const pairDiv = document.createElement('div');
-  pairDiv.className = 'battle-pair';
+    <div id="deck-container">
+      <h3>Колода</h3>
+      <div id="deck" title="Колода карт">🂠</div>
+      <button id="take-card-btn" disabled>Взять карту</button>
+    </div>
 
-  const attackEl = document.createElement('div');
-  attackEl.className = 'battle-card attack-card';
-  attackEl.textContent = attackCard.rank + attackCard.suit;
-  if (attackCard.suit === '♥' || attackCard.suit === '♦') attackEl.classList.add('red');
+    <div id="trump-suit"></div>
 
-  pairDiv.appendChild(attackEl);
+    <h3>Стол (ход):</h3>
+    <div id="battlefield"></div>
 
-  if (defenseCard) {
-    const defenseEl = document.createElement('div');
-    defenseEl.className = 'battle-card defense-card';
-    defenseEl.textContent = defenseCard.rank + defenseCard.suit;
-    if (defenseCard.suit === '♥' || defenseCard.suit === '♦') defenseEl.classList.add('red');
-    pairDiv.appendChild(defenseEl);
-  }
+    <h3>Карты бота:</h3>
+    <div id="bot-hand" class="hand"></div>
 
-  battlefieldDiv.appendChild(pairDiv);
-}
+    <h3>Ваша рука:</h3>
+    <div id="player-hand" class="hand"></div>
 
-// В playerPlayCard и botPlay добавлять карты так:
+    <div id="game-log"></div>
+  </div>
 
-// При ходе игрока:
-addBattlePair(card); // карта игрока
-
-// При ходе бота:
-const lastPair = battlefieldDiv.lastElementChild;
-const defenseCardEl = document.createElement('div');
-defenseCardEl.className = 'battle-card defense-card';
-defenseCardEl.textContent = botCard.rank + botCard.suit;
-// добавить класс red, если нужно
-lastPair.appendChild(defenseCardEl);
+  <script src="script.js"></script>
+</body>
+</html>
