@@ -3,50 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Durak Game</title>
+  <title>Игра Дурак</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="game-container"></div>
-  <script src="script.js"></script>
+  <div id="game-container">
+    <h1>Игра Дурак</h1>
+    <button id="start-game-btn">Начать игру</button>
+    <div id="trump-suit"></div>
+    <div id="player-hand"></div>
+    <div id="bot-hand"></div>
+    <div id="game-log"></div>
+  </div>
 
-  <script>
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.ready();
-
-      console.log('Telegram WebApp API доступен');
-
-      tg.BackButton.show();
-      tg.BackButton.onClick(() => tg.close());
-    } else {
-      console.log('Telegram WebApp API не доступен — запусти в Telegram');
-    }
-  </script>
-</body>
-</html>
-<div id="game-container">
-  <h2>Козырь: <span id="trump-card"></span></h2>
-  <h3>Ваша рука:</h3>
-  <div id="player-hand"></div>
-  <h3>Карты бота:</h3>
-  <div id="bot-hand"></div>
-</div>
-<body>
-  <div id="game-container"></div>
-  <script src="script.js"></script>
-</body>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Durak Game</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <h1>Игра Дурак</h1>
-  <div id="game-container"></div>
   <script src="script.js"></script>
 </body>
 </html>
