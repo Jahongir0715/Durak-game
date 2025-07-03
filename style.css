@@ -1,42 +1,94 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #0b4a6f;
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-#game-container {
-  max-width: 600px;
-  margin: 0 auto;
-  background: #194d6f;
-  padding: 15px;
-  border-radius: 10px;
-}
-
+/* Карточка */
 .card {
-  display: inline-block;
-  border-radius: 5px;
+  width: 60px;
+  height: 90px;
+  border-radius: 8px;
   background: white;
+  border: 1.5px solid #333;
+  box-shadow: 1px 2px 5px rgba(0,0,0,0.3);
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px 8px;
+  font-weight: 700;
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
   color: black;
-  margin: 5px;
-  padding: 10px 15px;
-  font-size: 20px;
-  font-weight: bold;
+}
+
+.card.red {
+  color: #d33;
+}
+
+.card .top-left, .card .bottom-right {
+  pointer-events: none;
+}
+
+/* Hover эффект для карт игрока */
+#player-hand .card:hover {
+  transform: translateY(-15px) scale(1.1);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+  z-index: 10;
+}
+
+/* Контейнеры для рук и поля */
+#player-hand, #bot-hand, #battlefield {
+  display: flex;
+  gap: 12px;
+  min-height: 100px;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  position: relative;
+}
+
+/* Колода и козырь */
+#deck, #trump {
+  font-size: 40px;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  margin: 0 15px;
+  transition: transform 0.3s ease;
 }
 
-#battlefield {
-  margin: 10px auto;
-  font-size: 24px;
-  font-weight: bold;
-  min-height: 40px;
+#deck:hover, #trump:hover {
+  transform: scale(1.2);
 }
 
-#bot-move {
-  margin: 10px;
-  font-size: 18px;
-  color: yellow;
+/* Анимация перемещения карты */
+@keyframes dealCardMove {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Фишки (чипы) */
+.chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #ffd700, #c0a000);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+  border: 2px solid #fff;
+  position: absolute;
+  cursor: default;
+  user-select: none;
+  font-weight: 700;
+  font-size: 14px;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+  transition: transform 0.3s ease;
 }
