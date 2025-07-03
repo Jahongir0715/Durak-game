@@ -1,21 +1,26 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Durak Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Добро пожаловать в игру Дурак!</h1>
-  <p>Это мини-игра для Telegram.</p>
-  <button onclick="alert('Вы сыграли карту!')">Сыграть карту</button>
+  <div id="game-container"></div>
+  <script src="script.js"></script>
+
+  <script>
+    // Telegram Web Apps API
+    window.Telegram.WebApp.ready();
+
+    const tg = window.Telegram.WebApp;
+
+    console.log('User:', tg.initDataUnsafe.user);
+
+    // Показываем кнопку Назад и закрываем WebApp по нажатию
+    tg.BackButton.show();
+    tg.BackButton.onClick(() => tg.close());
+  </script>
 </body>
-</html><script>
-  window.Telegram.WebApp.ready();
-
-  const tg = window.Telegram.WebApp;
-
-  console.log('User:', tg.initDataUnsafe.user);
-
-  tg.BackButton.show();
-  tg.BackButton.onClick(() => tg.close());
-</script>
+</html>
