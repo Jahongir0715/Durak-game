@@ -1,118 +1,178 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
+// --- Константы и данные карт ---
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const SUITS = ['♠', '♥', '♦', '♣']; // Пики, червы, бубны, трефы
+const RANKS = ['6', '7', '8', '9', '10', 'В', 'Д', 'К', 'Т']; // 6 - Туз
 
-const PORT = 3000;
+// Старшинство для сравнения карт (индексы из RANKS)
+const rankValue = rank => RANKS.indexOf(rank);
 
-app.use(express.static(path.join(__dirname, 'public')));
+// --- Переменные состояния ---
 
-let players = [];  // массив игроков {id, hand}
 let deck = [];
-let trumpCard = null;
-let battlefield = [];
-let currentAttackerIndex = 0; // индекс в players - кто ходит
+let trumpSuit = null;
+let playerHand = [];
+let botHand = [];
+let battlefield = []; // карты в текущем ходе (атака и защита)
+
+// --- Элементы DOM ---
+
+const deckElem = document.getElementById('deck');
+const trumpElem = document.getElementById('trump');
+const playerHandElem = document.getElementById('player-hand');
+const botHandElem = document.getElementById('bot-hand');
+const battlefieldElem = document.getElementById('battlefield');
+const startBtn = document.getElementById('start-game-btn');
+const gameLog = document.getElementById('game-log');
+
+// --- Создаем колоду 36 карт ---
 
 function createDeck() {
-  const suits = ['♠', '♣', '♥', '♦'];
-  const ranks = ['6', '7', '8', '9', '10', 'В', 'Д', 'К', 'Т'];
-  let newDeck = [];
-  for (let suit of suits) {
-    for (let rank of ranks) {
-      newDeck.push({ suit, rank });
+  const cards = [];
+  for (const suit of SUITS) {
+    for (const rank of RANKS) {
+      cards.push({suit, rank});
     }
   }
-  return newDeck.sort(() => Math.random() - 0.5);
+  return cards;
 }
+
+// --- Перемешивание колоды (Fisher-Yates) ---
+
+function shuffle(deck) {
+  for (let i = deck.length -1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i +1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+}
+
+// --- Выбираем козырь (последняя карта в колоде) ---
+
+function chooseTrump(deck) {
+  const trumpCard = deck[deck.length -1];
+  return trumpCard.suit;
+}
+
+// --- Отрисовка карт в элементе (рука игрока/бота) ---
+
+function renderHand(container, hand, hideCards = false) {
+  container.innerHTML = '';
+  hand.forEach(card => {
+    const cardDiv = document.createElement('div');
+    cardDiv.classList.add('card');
+    if (card.suit === '♥' || card.suit === '♦') cardDiv.classList.add('red');
+
+    if (hideCards) {
+      cardDiv.textContent = '🂠';
+    } else {
+      cardDiv.innerHTML = `<div class="top-left">${card.rank}${card.suit}</div><div class="bottom-right">${card.rank}${card.suit}</div>`;
+    }
+
+    container.appendChild(cardDiv);
+  });
+}
+
+// --- Обновление отображения колоды и козыря ---
+
+function renderDeck() {
+  deckElem.textContent = deck.length > 0 ? `🂠 (${deck.length})` : 'Пусто';
+  trumpElem.textContent = trumpSuit ? trumpSuit : '';
+}
+
+// --- Раздача карт (по 6 каждому, если есть карты в колоде) ---
 
 function dealCards() {
-  for (let player of players) {
-    player.hand = deck.splice(0, 6);
+  while (playerHand.length < 6 && deck.length > 0) {
+    playerHand.push(deck.pop());
+  }
+  while (botHand.length < 6 && deck.length > 0) {
+    botHand.push(deck.pop());
   }
 }
 
-io.on('connection', (socket) => {
-  console.log(`Player connected: ${socket.id}`);
+// --- Лог игры ---
 
-  // Добавляем игрока в список
-  players.push({ id: socket.id, hand: [] });
+function addLog(text) {
+  const p = document.createElement('p');
+  p.textContent = text;
+  gameLog.appendChild(p);
+  gameLog.scrollTop = gameLog.scrollHeight;
+}
 
-  // Если достаточно игроков — начинаем игру
-  if (players.length >= 2 && !trumpCard) {
-    startGame();
-  }
-
-  // Отправить игроку обновления
-  sendGameState();
-
-  // Когда игрок ходит
-  socket.on('playerMove', (cardIndex) => {
-    if (players[currentAttackerIndex].id !== socket.id) {
-      socket.emit('errorMessage', 'Сейчас не ваш ход!');
-      return;
-    }
-    // TODO: логика проверки и обработки хода игрока
-    // Для простоты пока просто передаем ход дальше
-
-    // Пример: удаляем карту из руки атакующего
-    let player = players[currentAttackerIndex];
-    const card = player.hand.splice(cardIndex, 1)[0];
-    battlefield.push({ attacker: card, defender: null });
-
-    // Переходим к следующему игроку (простой круг)
-    currentAttackerIndex = (currentAttackerIndex + 1) % players.length;
-
-    sendGameState();
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`Player disconnected: ${socket.id}`);
-    players = players.filter(p => p.id !== socket.id);
-    // Если игроков меньше 2 — сбрасываем игру
-    if (players.length < 2) {
-      resetGame();
-    } else {
-      sendGameState();
-    }
-  });
-});
+// --- Запуск новой игры ---
 
 function startGame() {
   deck = createDeck();
-  trumpCard = deck[deck.length - 1];
+  shuffle(deck);
+  trumpSuit = chooseTrump(deck);
+
+  playerHand = [];
+  botHand = [];
+  battlefield = [];
+
   dealCards();
-  battlefield = [];
-  currentAttackerIndex = 0;
-  console.log('Game started!');
-  sendGameState();
+
+  renderDeck();
+  renderHands();
+  renderBattlefield();
+
+  addLog('Игра началась! Козырь: ' + trumpSuit);
+  startBtn.disabled = true;
 }
 
-function resetGame() {
-  deck = [];
-  trumpCard = null;
-  battlefield = [];
-  currentAttackerIndex = 0;
-  console.log('Game reset due to insufficient players');
+// --- Обновление рук игроков ---
+
+function renderHands() {
+  renderHand(playerHandElem, playerHand);
+  renderHand(botHandElem, botHand, true); // ботские карты скрыты
 }
 
-function sendGameState() {
-  for (let player of players) {
-    const otherPlayers = players.filter(p => p.id !== player.id);
-    io.to(player.id).emit('gameState', {
-      yourHand: player.hand,
-      battlefield,
-      trumpCard,
-      playersCount: players.length,
-      yourTurn: players[currentAttackerIndex].id === player.id,
-      otherPlayers: otherPlayers.map(p => ({ id: p.id, handCount: p.hand.length })),
-    });
-  }
+// --- Обновление стола ---
+
+function renderBattlefield() {
+  battlefieldElem.innerHTML = '';
+  battlefield.forEach(pair => {
+    // pair: {attack: card, defense: card|null}
+    const pairDiv = document.createElement('div');
+    pairDiv.style.display = 'flex';
+    pairDiv.style.flexDirection = 'column';
+    pairDiv.style.gap = '5px';
+
+    const attackCard = createCardDiv(pair.attack);
+    pairDiv.appendChild(attackCard);
+
+    if (pair.defense) {
+      const defenseCard = createCardDiv(pair.defense);
+      pairDiv.appendChild(defenseCard);
+    } else {
+      const defensePlaceholder = document.createElement('div');
+      defensePlaceholder.style.width = '60px';
+      defensePlaceholder.style.height = '90px';
+      pairDiv.appendChild(defensePlaceholder);
+    }
+
+    battlefieldElem.appendChild(pairDiv);
+  });
 }
 
-server.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
+// --- Создать DOM элемент для карты ---
+
+function createCardDiv(card) {
+  const cardDiv = document.createElement('div');
+  cardDiv.classList.add('card');
+  if (card.suit === '♥' || card.suit === '♦') cardDiv.classList.add('red');
+  cardDiv.innerHTML = `<div class="top-left">${card.rank}${card.suit}</div><div class="bottom-right">${card.rank}${card.suit}</div>`;
+  return cardDiv;
+}
+
+// --- Обработчики ---
+
+startBtn.addEventListener('click', startGame);
+
+// --- Начинаем ---
+
+// Отрисуем пустое поле при загрузке
+renderDeck();
+renderHands();
+renderBattlefield();
+addLog('Нажмите "Начать игру" чтобы стартовать');
+
