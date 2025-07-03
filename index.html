@@ -9,4 +9,13 @@
   <p>Это мини-игра для Telegram.</p>
   <button onclick="alert('Вы сыграли карту!')">Сыграть карту</button>
 </body>
-</html>
+</html><script>
+  window.Telegram.WebApp.ready();
+
+  const tg = window.Telegram.WebApp;
+
+  console.log('User:', tg.initDataUnsafe.user);
+
+  tg.BackButton.show();
+  tg.BackButton.onClick(() => tg.close());
+</script>
