@@ -1,1 +1,53 @@
-node server.js
+const socket = io();
+
+const playerHandDiv = document.getElementById('playerHand');
+const battlefieldDiv = document.getElementById('battlefield');
+const trumpSuitSpan = document.getElementById('trumpSuit');
+const gameLogDiv = document.getElementById('gameLog');
+const yourTurnSpan = document.getElementById('yourTurn');
+
+let yourHand = [];
+let battlefield = [];
+let trumpCard = null;
+let yourTurn = false;
+
+socket.on('gameState', (data) => {
+  yourHand = data.yourHand;
+  battlefield = data.battlefield;
+  trumpCard = data.trumpCard;
+  yourTurn = data.yourTurn;
+
+  render();
+});
+
+function render() {
+  trumpSuitSpan.textContent = trumpCard ? trumpCard.suit : '';
+  playerHandDiv.innerHTML = '';
+  battlefieldDiv.innerHTML = '';
+  gameLogDiv.textContent = yourTurn ? 'Ваш ход' : 'Ждите ход другого игрока';
+
+  yourHand.forEach((card, index) => {
+    const cardDiv = document.createElement('div');
+    cardDiv.textContent = card.rank + card.suit;
+    cardDiv.className = 'card';
+    cardDiv.onclick = () => {
+      if (!yourTurn) return alert('Не ваш ход!');
+      socket.emit('playerMove', index);
+    };
+    playerHandDiv.appendChild(cardDiv);
+  });
+
+  battlefield.forEach(fight => {
+    const attDiv = document.createElement('div');
+    attDiv.textContent = fight.attacker.rank + fight.attacker.suit;
+    attDiv.className = 'card';
+    battlefieldDiv.appendChild(attDiv);
+
+    if (fight.defender) {
+      const defDiv = document.createElement('div');
+      defDiv.textContent = fight.defender.rank + fight.defender.suit;
+      defDiv.className = 'card';
+      battlefieldDiv.appendChild(defDiv);
+    }
+  });
+}
