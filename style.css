@@ -1,94 +1,59 @@
-/* Карточка */
+/* style.css */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #1c1c1c;
+  color: white;
+}
+
+#game-container {
+  padding: 20px;
+}
+
+#header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#trump-suit {
+  font-size: 18px;
+  margin-top: 5px;
+}
+
+#table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#bot-hand {
+  margin-bottom: 20px;
+}
+
+#battlefield {
+  min-height: 100px;
+  border: 2px dashed #ccc;
+  width: 90%;
+  margin-bottom: 20px;
+}
+
+#player-hand {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 .card {
   width: 60px;
   height: 90px;
-  border-radius: 8px;
-  background: white;
-  border: 1.5px solid #333;
-  box-shadow: 1px 2px 5px rgba(0,0,0,0.3);
-  position: relative;
-  user-select: none;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: white;
+  color: black;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 5px 8px;
-  font-weight: 700;
-  font-family: 'Arial', sans-serif;
-  font-size: 18px;
-  color: black;
-}
-
-.card.red {
-  color: #d33;
-}
-
-.card .top-left, .card .bottom-right {
-  pointer-events: none;
-}
-
-/* Hover эффект для карт игрока */
-#player-hand .card:hover {
-  transform: translateY(-15px) scale(1.1);
-  box-shadow: 0 8px 12px rgba(0,0,0,0.4);
-  z-index: 10;
-}
-
-/* Контейнеры для рук и поля */
-#player-hand, #bot-hand, #battlefield {
-  display: flex;
-  gap: 12px;
-  min-height: 100px;
   align-items: center;
   justify-content: center;
-  margin: 10px 0;
-  position: relative;
-}
-
-/* Колода и козырь */
-#deck, #trump {
-  font-size: 40px;
+  font-weight: bold;
   cursor: pointer;
-  user-select: none;
-  margin: 0 15px;
-  transition: transform 0.3s ease;
-}
-
-#deck:hover, #trump:hover {
-  transform: scale(1.2);
-}
-
-/* Анимация перемещения карты */
-@keyframes dealCardMove {
-  0% {
-    transform: translate(0, 0) scale(0.5);
-    opacity: 0;
-  }
-  100% {
-    transform: translate(var(--tx), var(--ty)) scale(1);
-    opacity: 1;
-  }
-}
-
-/* Фишки (чипы) */
-.chip {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, #ffd700, #c0a000);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
-  border: 2px solid #fff;
-  position: absolute;
-  cursor: default;
-  user-select: none;
-  font-weight: 700;
-  font-size: 14px;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Arial, sans-serif;
-  pointer-events: none;
-  transition: transform 0.3s ease;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
