@@ -108,3 +108,48 @@ function renderGame() {
 // Вызовем функцию для начальной отрисовки
 renderGame();
 
+// Отрисовка карт игрока с кликом (как раньше)
+function renderPlayerHand() {
+  const container = document.getElementById('player-hand');
+  container.innerHTML = '';
+
+  playerHand.forEach((card, index) => {
+    const cardElem = document.createElement('div');
+    cardElem.textContent = card.rank + card.suit;
+    cardElem.className = 'card';
+    cardElem.onclick = () => playerPlaysCard(index);
+    container.appendChild(cardElem);
+  });
+}
+
+// Отрисовка карт бота (рубашкой, без клика)
+function renderBotHand() {
+  const container = document.getElementById('bot-hand');
+  container.innerHTML = '';
+
+  botHand.forEach(() => {
+    const cardElem = document.createElement('div');
+    cardElem.className = 'card bot-card';
+    container.appendChild(cardElem);
+  });
+}
+
+function renderGame() {
+  document.getElementById('trump-card').textContent = trumpCard.rank + trumpCard.suit;
+
+  renderPlayerHand();
+  renderBotHand();
+}
+
+// При клике карта уходит из руки игрока
+function playerPlaysCard(cardIndex) {
+  const playedCard = playerHand[cardIndex];
+  console.log('Игрок ходит картой:', playedCard.rank + playedCard.suit);
+
+  playerHand.splice(cardIndex, 1);
+
+  renderGame();
+}
+
+// Изначальный вызов
+renderGame();
