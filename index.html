@@ -1,27 +1,27 @@
-<script>
-  if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Durak Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+  <script src="script.js"></script>
 
-    const tg = window.Telegram.WebApp;
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
 
-    console.log('User:', tg.initDataUnsafe.user);
+      console.log('Telegram WebApp API доступен');
 
-    tg.BackButton.show();
-    tg.BackButton.onClick(() => tg.close());
-  } else {
-    console.log('Telegram WebApp API не доступен');
-  }
-</script>
-<script>
-  if (window.Telegram && window.Telegram.WebApp) {
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-
-    console.log('Telegram WebApp API доступен');
-    
-    tg.BackButton.show();
-    tg.BackButton.onClick(() => tg.close());
-  } else {
-    console.log('Telegram WebApp API не доступен — запусти в Telegram');
-  }
-</script>
+      tg.BackButton.show();
+      tg.BackButton.onClick(() => tg.close());
+    } else {
+      console.log('Telegram WebApp API не доступен — запусти в Telegram');
+    }
+  </script>
+</body>
+</html>
