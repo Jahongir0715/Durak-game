@@ -52,3 +52,63 @@ io.on('connection', (socket) => {
     console.log('User disconnected: ' + socket.id);
   });
 });
+// Получить позицию элемента на экране
+function getPos(elem) {
+  const rect = elem.getBoundingClientRect();
+  return {x: rect.left + window.scrollX, y: rect.top + window.scrollY};
+}
+
+// Функция анимированной раздачи карты
+function dealCardWithAnimation(targetContainer, card, delay = 0) {
+  return new Promise(resolve => {
+    // Создаем DOM элемент карты поверх всего
+    const flyingCard = createCardDiv(card);
+    flyingCard.style.position = 'absolute';
+    flyingCard.style.zIndex = 1000;
+    flyingCard.style.width = '60px';
+    flyingCard.style.height = '90px';
+
+    // Позиция колоды — старт анимации
+    const deckPos = getPos(deckElem);
+    flyingCard.style.left = deckPos.x + 'px';
+    flyingCard.style.top = deckPos.y + 'px';
+    flyingCard.style.transform = 'scale(0.5)';
+    document.body.appendChild(flyingCard);
+
+    // Цель — позиция контейнера руки игрока/бота
+    const targetPos = getPos(targetContainer);
+
+    // Смещение (примерно, можно точнее сделать)
+    const tx = targetPos.x - deckPos.x;
+    const ty = targetPos.y - deckPos.y;
+
+    // Запускаем анимацию через CSS переменные и transition
+    setTimeout(() => {
+      flyingCard.style.transition = 'transform 0.6s ease, left 0.6s ease, top 0.6s ease, opacity 0.6s ease';
+      flyingCard.style.transform = 'scale(1)';
+      flyingCard.style.left = targetPos.x + 'px';
+      flyingCard.style.top = targetPos.y + 'px';
+    }, delay);
+
+    // По окончании анимации удаляем летящую карту и обновляем руку
+    flyingCard.addEventListener('transitionend', () => {
+      flyingCard.remove();
+      renderHand(targetContainer, targetContainer === playerHandElem ? playerHand : botHand, targetContainer === botHandElem);
+      resolve();
+    });
+  });
+}
+
+// Новая функция раздачи с анимацией
+async function dealCardsAnimated() {
+  while (playerHand.length < 6 && deck.length > 0) {
+    playerHand.push(deck.pop());
+    await dealCardWithAnimation(playerHandElem, playerHand[playerHand.length-1], 0);
+    renderDeck();
+  }
+  while (botHand.length < 6 && deck.length > 0) {
+    botHand.push(deck.pop());
+    await dealCardWithAnimation(botHandElem, botHand[botHand.length-1], 0);
+    renderDeck();
+  }
+}
