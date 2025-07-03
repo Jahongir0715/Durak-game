@@ -103,3 +103,40 @@ body {
   font-size: 18px;
   font-weight: bold;
 }
+@keyframes move-to-battlefield {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    z-index: 10;
+  }
+  100% {
+    transform: translate(0, -120px) scale(1.2);
+    opacity: 1;
+    z-index: 10;
+  }
+}
+
+.battle-card {
+  position: relative;
+  display: inline-block;
+  margin: 0 5px;
+  font-size: 24px;
+  width: 60px;
+  height: 90px;
+  border-radius: 10px;
+  border: 2px solid white;
+  line-height: 90px;
+  text-align: center;
+  background: white;
+  color: black;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+  user-select: none;
+}
+
+.battle-card.red {
+  color: red;
+}
+
+.move-up {
+  animation: move-to-battlefield 0.5s forwards;
+}
