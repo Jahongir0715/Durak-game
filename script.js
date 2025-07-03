@@ -345,3 +345,8 @@ function playerPlayCard(index) {
     isMyTurn = false; // ход передан другому игроку
   }
 }
+socket.on('opponentMove', (card) => {
+  // Добавляем карту соперника в стол и т.п.
+  gameLogDiv.textContent = `Соперник походил: ${card.rank}${card.suit}. Ваш ход.`;
+  isMyTurn = true;
+});
