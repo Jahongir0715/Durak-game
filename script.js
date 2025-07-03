@@ -54,3 +54,10 @@ function renderCards(hand, containerId) {
 }
 
 renderGame();
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+  // здесь код с tg
+} else {
+  // можно вывести предупреждение или просто не делать ничего
+  console.log('Telegram WebApp API не доступен — запусти в Telegram');
+}
