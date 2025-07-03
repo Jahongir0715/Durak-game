@@ -318,3 +318,18 @@ io.on('connection', socket => {
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+const socket = io();  // Автоматически подключается к серверу
+
+const roomId = prompt("Введите ID комнаты (например, 'game123'): ");
+socket.emit('joinGame', roomId);
+
+socket.on('startGame', (data) => {
+  console.log(data.message);
+  // Тут запускаем нашу функцию startGame()
+  startGame(true); // true — значит онлайн игра, второй игрок — реальный человек
+});
+
+socket.on('opponentMove', (move) => {
+  console.log("Ход оппонента", move);
+  // Тут обрабатываем ход соперника, обновляем интерфейс
+});
