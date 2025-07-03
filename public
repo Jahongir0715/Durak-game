@@ -1,53 +1,25 @@
-const socket = io();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Durak Multiplayer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Игра "Дурак" Онлайн</h1>
+    <div id="status"></div>
 
-const playerHandDiv = document.getElementById('playerHand');
-const battlefieldDiv = document.getElementById('battlefield');
-const trumpSuitSpan = document.getElementById('trumpSuit');
-const gameLogDiv = document.getElementById('gameLog');
-const yourTurnSpan = document.getElementById('yourTurn');
+    <div id="trump">Козырь: <span></span></div>
 
-let yourHand = [];
-let battlefield = [];
-let trumpCard = null;
-let yourTurn = false;
+    <div id="battlefield" class="cards-row"></div>
 
-socket.on('gameState', (data) => {
-  yourHand = data.yourHand;
-  battlefield = data.battlefield;
-  trumpCard = data.trumpCard;
-  yourTurn = data.yourTurn;
+    <h2>Ваша рука:</h2>
+    <div id="player-hand" class="cards-row"></div>
+  </div>
 
-  render();
-});
-
-function render() {
-  trumpSuitSpan.textContent = trumpCard ? trumpCard.suit : '';
-  playerHandDiv.innerHTML = '';
-  battlefieldDiv.innerHTML = '';
-  gameLogDiv.textContent = yourTurn ? 'Ваш ход' : 'Ждите ход другого игрока';
-
-  yourHand.forEach((card, index) => {
-    const cardDiv = document.createElement('div');
-    cardDiv.textContent = card.rank + card.suit;
-    cardDiv.className = 'card';
-    cardDiv.onclick = () => {
-      if (!yourTurn) return alert('Не ваш ход!');
-      socket.emit('playerMove', index);
-    };
-    playerHandDiv.appendChild(cardDiv);
-  });
-
-  battlefield.forEach(fight => {
-    const attDiv = document.createElement('div');
-    attDiv.textContent = fight.attacker.rank + fight.attacker.suit;
-    attDiv.className = 'card';
-    battlefieldDiv.appendChild(attDiv);
-
-    if (fight.defender) {
-      const defDiv = document.createElement('div');
-      defDiv.textContent = fight.defender.rank + fight.defender.suit;
-      defDiv.className = 'card';
-      battlefieldDiv.appendChild(defDiv);
-    }
-  });
-}
+  <script src="script.js"></script>
+</body>
+</html>
