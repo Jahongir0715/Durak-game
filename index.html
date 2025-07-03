@@ -1,26 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Durak Game</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="game-container"></div>
-  <script src="script.js"></script>
-
-  <script>
-    // Telegram Web Apps API
+<script>
+  if (window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.ready();
 
     const tg = window.Telegram.WebApp;
 
     console.log('User:', tg.initDataUnsafe.user);
 
-    // Показываем кнопку Назад и закрываем WebApp по нажатию
     tg.BackButton.show();
     tg.BackButton.onClick(() => tg.close());
-  </script>
-</body>
-</html>
+  } else {
+    console.log('Telegram WebApp API не доступен');
+  }
+</script>
