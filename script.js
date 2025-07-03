@@ -53,11 +53,18 @@ function renderCards(hand, containerId) {
   });
 }
 
-renderGame();
+// Проверяем, есть ли Telegram WebApp API
 if (window.Telegram && window.Telegram.WebApp) {
   const tg = window.Telegram.WebApp;
-  // здесь код с tg
+  tg.ready();
+
+  console.log('Telegram WebApp API доступен');
+
+  // Можно добавить сюда взаимодействие с tg, если нужно
 } else {
-  // можно вывести предупреждение или просто не делать ничего
   console.log('Telegram WebApp API не доступен — запусти в Telegram');
 }
+
+// Запускаем отрисовку игры
+renderGame();
+
