@@ -333,3 +333,15 @@ socket.on('opponentMove', (move) => {
   console.log("Ход оппонента", move);
   // Тут обрабатываем ход соперника, обновляем интерфейс
 });
+function playerPlayCard(index) {
+  if (isMyTurn) {
+    const card = playerHand.splice(index, 1)[0];
+    renderHand(playerHand, playerHandDiv, false, playerPlayCard);
+    gameLogDiv.textContent = `Вы походили: ${card.rank}${card.suit}. Ожидаем ход соперника...`;
+
+    // Отправляем ход соперника на сервер
+    socket.emit('playerMove', { roomId, move: card });
+
+    isMyTurn = false; // ход передан другому игроку
+  }
+}
