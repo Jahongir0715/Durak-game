@@ -112,3 +112,22 @@ async function dealCardsAnimated() {
     renderDeck();
   }
 }
+async function startGame() {
+  deck = createDeck();
+  shuffle(deck);
+  trumpSuit = chooseTrump(deck);
+
+  playerHand = [];
+  botHand = [];
+  battlefield = [];
+
+  renderDeck();
+  renderHands();
+  renderBattlefield();
+
+  addLog('Игра началась! Козырь: ' + trumpSuit);
+  startBtn.disabled = true;
+
+  await dealCardsAnimated(); // анимация раздачи карт
+  addLog('Карты разданы');
+}
