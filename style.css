@@ -1,94 +1,5 @@
 body {
   font-family: Arial, sans-serif;
-  background: #0b3d91; /* тёмно-синий фон */
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-#game-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.card {
-  display: inline-block;
-  border: 1px solid white;
-  border-radius: 8px;
-  padding: 10px 15px;
-  margin: 5px;
-  font-size: 24px;
-  background: #2153b1;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s;
-}
-
-.card:hover {
-  background-color: #4169e1;
-}
-
-.card {
-  display: inline-block;
-  border: 1px solid white;
-  border-radius: 8px;
-  padding: 15px 20px;
-  margin: 5px;
-  font-size: 24px;
-  background: #2153b1;
-  color: white;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s;
-  width: 60px;
-  height: 90px;
-  line-height: 90px;
-  text-align: center;
-  font-weight: bold;
-  box-shadow: 0 0 5px #0008;
-}
-
-.card:hover {
-  background-color: #4169e1;
-}
-
-.card.bot-card {
-  background: linear-gradient(45deg, #444 0%, #222 100%);
-  cursor: default;
-  color: transparent;
-  box-shadow: none;
-  position: relative;
-}
-
-.card.bot-card::after {
-  content: "🂠";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 30px;
-  color: #ccc;
-}
-#table-cards {
-  margin: 20px auto;
-  max-width: 600px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.table-pair {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.table-pair .card {
-  margin: 3px 0;
-}
-body {
-  font-family: Arial, sans-serif;
   background: #0b3d91;
   color: white;
   text-align: center;
@@ -100,6 +11,13 @@ body {
   margin: 0 auto;
 }
 
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
 .card {
   display: inline-block;
   border: 1px solid white;
@@ -117,16 +35,11 @@ body {
   background-color: #4169e1;
 }
 
-.bot-card {
-  background: #00000088; /* закрытые карты бота */
+#player-hand, #bot-hand {
+  margin-top: 20px;
 }
 
-.table-pair {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
-}
-
-.table-pair .card {
-  margin: 0 5px;
+#game-log {
+  margin-top: 30px;
+  min-height: 50px;
 }
