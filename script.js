@@ -1,1 +1,12 @@
-document.getElementById('game-container').innerHTML = '<h2>Добро пожаловать в Durak!</h2><button onclick="alert(\'Пока это просто шаблон\')">Играть</button>';renderGame();
+function renderCards(hand, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  hand.forEach(card => {
+    const cardElem = document.createElement('div');
+    cardElem.textContent = card.rank + card.suit;
+    cardElem.className = 'card';
+    container.appendChild(cardElem);
+  });
+}
+
+renderGame();
