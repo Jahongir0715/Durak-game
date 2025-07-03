@@ -12,3 +12,16 @@
     console.log('Telegram WebApp API не доступен');
   }
 </script>
+<script>
+  if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+
+    console.log('Telegram WebApp API доступен');
+    
+    tg.BackButton.show();
+    tg.BackButton.onClick(() => tg.close());
+  } else {
+    console.log('Telegram WebApp API не доступен — запусти в Telegram');
+  }
+</script>
