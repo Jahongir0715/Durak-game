@@ -398,3 +398,39 @@ startBtn.onclick = () => {
     startGame();
   }
 };
+const battlefieldDiv = document.getElementById('battlefield');
+
+/**
+ * Добавляет пару карт на стол
+ * @param {Object} attackCard — карта атакующего (обязательная)
+ * @param {Object|null} defenseCard — карта защитника (может отсутствовать)
+ */
+function addBattlePair(attackCard, defenseCard = null) {
+  const pairDiv = document.createElement('div');
+  pairDiv.className = 'battle-pair';
+
+  const attackEl = document.createElement('div');
+  attackEl.className = 'battle-card attack-card';
+  attackEl.textContent = attackCard.rank + attackCard.suit;
+  if (attackCard.suit === '♥' || attackCard.suit === '♦') attackEl.classList.add('red');
+
+  pairDiv.appendChild(attackEl);
+
+  if (defenseCard) {
+    const defenseEl = document.createElement('div');
+    defenseEl.className = 'battle-card defense-card';
+    defenseEl.textContent = defenseCard.rank + defenseCard.suit;
+    if (defenseCard.suit === '♥' || defenseCard.suit === '♦') defenseEl.classList.add('red');
+
+    pairDiv.appendChild(defenseEl);
+  }
+
+  battlefieldDiv.appendChild(pairDiv);
+}
+
+/**
+ * Очищает поле боя
+ */
+function clearBattlefield() {
+  battlefieldDiv.innerHTML = '';
+}
