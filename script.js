@@ -67,4 +67,44 @@ if (window.Telegram && window.Telegram.WebApp) {
 
 // Запускаем отрисовку игры
 renderGame();
+// Отрисовка карт игрока с кликом
+function renderPlayerHand() {
+  const container = document.getElementById('player-hand');
+  container.innerHTML = '';
+
+  playerHand.forEach((card, index) => {
+    const cardElem = document.createElement('div');
+    cardElem.textContent = card.rank + card.suit;
+    cardElem.className = 'card';
+    cardElem.onclick = () => playerPlaysCard(index);
+    container.appendChild(cardElem);
+  });
+}
+
+// Функция, которая вызывается, когда игрок выбирает карту
+function playerPlaysCard(cardIndex) {
+  const playedCard = playerHand[cardIndex];
+  console.log('Игрок ходит картой:', playedCard.rank + playedCard.suit);
+
+  // Тут добавим логику хода игрока
+  // Пока просто уберём карту из руки и перерисуем
+  playerHand.splice(cardIndex, 1);
+
+  renderPlayerHand();
+}
+
+// Запускаем отрисовку в самом конце renderGame
+function renderGame() {
+  const gameContainer = document.getElementById('game-container');
+  gameContainer.innerHTML = `
+    <h2>Козырь: ${trumpCard.rank}${trumpCard.suit}</h2>
+    <h3>Ваша рука:</h3>
+    <div id="player-hand"></div>
+  `;
+
+  renderPlayerHand();
+}
+
+// Вызовем функцию для начальной отрисовки
+renderGame();
 
