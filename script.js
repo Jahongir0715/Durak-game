@@ -1,50 +1,42 @@
-// Элементы DOM
-const startBtn = document.getElementById('start-game-btn');
-const deckDiv = document.getElementById('deck');
-const takeCardBtn = document.getElementById('take-card-btn');
-const trumpSuitDiv = document.getElementById('trump-suit');
+const ranksOrder = ['6', '7', '8', '9', '10', 'В', 'Д', 'К', 'Т'];
+const suits = ['♠', '♣', '♥', '♦'];
+
+let deck = [];
+let playerHand = [];
+let botHand = [];
+let trumpCard = null;
+let trumpSuit = null;
+
 const playerHandDiv = document.getElementById('player-hand');
 const botHandDiv = document.getElementById('bot-hand');
 const battlefieldDiv = document.getElementById('battlefield');
+const trumpSuitDiv = document.getElementById('trump-suit');
 const gameLogDiv = document.getElementById('game-log');
+const deckDiv = document.getElementById('deck');
+const startBtn = document.getElementById('start-game-btn');
+const takeCardBtn = document.getElementById('take-card-btn');
 
-// Карты и состояния
-let deck = [];
-let trumpCard = null;
-let trumpSuit = null;
-let playerHand = [];
-let botHand = [];
-let attackingCard = null;
-let defendingCard = null;
-
-// Старшинство карт (по правилу)
-const ranksOrder = ['6', '7', '8', '9', '10', 'В', 'Д', 'К', 'Т'];
-
-// Создать колоду
 function createDeck() {
-  const suits = ['♠', '♥', '♦', '♣'];
-  const ranks = ['6', '7', '8', '9', '10', 'В', 'Д', 'К', 'Т'];
   const d = [];
-  for (const suit of suits) {
-    for (const rank of ranks) {
+  suits.forEach(suit => {
+    ranksOrder.forEach(rank => {
       d.push({rank, suit});
-    }
-  }
+    });
+  });
   return d;
 }
 
-// Тасование колоды (Fisher-Yates)
 function shuffle(array) {
-  for(let i = array.length - 1; i > 0; i--) {
+  for(let i = array.length -1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i+1));
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
 
-// Определение кто ходит первым (у кого младшая козырная карта)
 function findFirstPlayer() {
-  let minTrumpIndex = Infinity;
-  let firstPlayer = 'player'; // player или bot
+  let minTrumpIndex = ranksOrder.length;
+  let firstPlayer = null;
+
   playerHand.forEach(card => {
     if (card.suit === trumpSuit) {
       const idx = ranksOrder.indexOf(card.rank);
@@ -66,7 +58,6 @@ function findFirstPlayer() {
   return firstPlayer;
 }
 
-// Отображение козырной масти
 function renderTrumpSuit() {
   if (!trumpCard) {
     trumpSuitDiv.textContent = '';
@@ -82,7 +73,6 @@ function renderTrumpSuit() {
   }
 }
 
-// Отображение колоды
 function renderDeck() {
   if (deck.length === 0) {
     deckDiv.textContent = 'Колода пуста';
@@ -93,7 +83,6 @@ function renderDeck() {
   }
 }
 
-// Отображение руки
 function renderHand(hand, container, hide = false, clickHandler = null) {
   container.innerHTML = '';
   hand.forEach((card, i) => {
@@ -108,7 +97,6 @@ function renderHand(hand, container, hide = false, clickHandler = null) {
   });
 }
 
-// Добавление пары карт на стол (атака и защита)
 function addBattlePair(attackCard, defenseCard = null) {
   const pairDiv = document.createElement('div');
   pairDiv.className = 'battle-pair';
@@ -130,26 +118,20 @@ function addBattlePair(attackCard, defenseCard = null) {
   battlefieldDiv.appendChild(pairDiv);
 }
 
-// Очистка стола
 function clearBattlefield() {
   battlefieldDiv.innerHTML = '';
 }
 
-// Функция сравнения карт по старшинству с учётом козыря
-// Возвращает true, если карта b бьёт карту a
 function beats(a, b) {
-  // Если карты одной масти, сравниваем ранги
   if (a.suit === b.suit) {
     return ranksOrder.indexOf(b.rank) > ranksOrder.indexOf(a.rank);
   }
-  // Если b — козырь, а a нет — бьет
   if (b.suit === trumpSuit && a.suit !== trumpSuit) {
     return true;
   }
   return false;
 }
 
-// Добор карт из колоды по очереди (начиная с атакующего)
 function refillHands(attacker) {
   const order = attacker === 'player' ? [playerHand, botHand] : [botHand, playerHand];
   order.forEach(hand => {
@@ -159,12 +141,10 @@ function refillHands(attacker) {
   });
 }
 
-// Переменные для контроля состояния игры
-let currentAttacker = null; // 'player' или 'bot'
+let currentAttacker = null;
 let isPlayerTurn = false;
-let attackingPairs = []; // пары {attack: card, defense: card|null}
+let attackingPairs = [];
 
-// Начинаем новую игру
 function startGame() {
   deck = createDeck();
   shuffle(deck);
@@ -176,7 +156,6 @@ function startGame() {
   trumpCard = deck[deck.length - 1];
   trumpSuit = trumpCard.suit;
 
-  // Раздача карт
   for (let i = 0; i < 6; i++) {
     playerHand.push(deck.pop());
     botHand.push(deck.pop());
@@ -197,7 +176,6 @@ function startGame() {
   }
 }
 
-// Обработка клика игрока на карту (для атаки)
 function onPlayerCardClick(index) {
   if (!isPlayerTurn) {
     gameLogDiv.textContent = 'Сейчас не ваш ход.';
@@ -225,17 +203,13 @@ function onPlayerCardClick(index) {
   setTimeout(botDefend, 1200);
 }
 
-// Бот отбивает карту
 function botDefend() {
   if (attackingPairs.length === 0) return;
 
   const attackCard = attackingPairs[0].attack;
-
-  // Находим первую карту, которая может побить карту атаки
   const defendIndex = botHand.findIndex(card => beats(attackCard, card));
 
   if (defendIndex === -1) {
-    // Бот не может побить - берет карты
     botHand = botHand.concat(attackingPairs.map(p => p.attack));
     botHand = botHand.concat(attackingPairs.filter(p => p.defense).map(p => p.defense));
     attackingPairs = [];
@@ -266,7 +240,6 @@ function botDefend() {
   renderHand(playerHand, playerHandDiv, false, onPlayerCardClick);
 }
 
-// Ход бота - атака
 function botAttack() {
   if (botHand.length === 0) {
     gameLogDiv.textContent = 'Бот выиграл!';
@@ -283,44 +256,18 @@ function botAttack() {
   isPlayerTurn = true;
 }
 
-// Блокировка рук игрока (отключение кликов)
 function disablePlayerHand() {
   playerHandDiv.querySelectorAll('.card').forEach(card => {
-    card.classList.add('disabled');
     card.style.pointerEvents = 'none';
+    card.style.opacity = '0.5';
   });
 }
 
-// Разблокировка рук игрока
 function enablePlayerHand() {
   playerHandDiv.querySelectorAll('.card').forEach(card => {
-    card.classList.remove('disabled');
     card.style.pointerEvents = 'auto';
+    card.style.opacity = '1';
   });
 }
 
-// Кнопка взять карту из колоды
-takeCardBtn.addEventListener('click', () => {
-  if (deck.length === 0) {
-    alert('Колода пуста!');
-    return;
-  }
-  if (!isPlayerTurn) {
-    gameLogDiv.textContent = 'Сейчас не ваш ход.';
-    return;
-  }
-  if (playerHand.length >= 6) {
-    gameLogDiv.textContent = 'У вас уже 6 карт!';
-    return;
-  }
-  const card = deck.pop();
-  playerHand.push(card);
-  renderHand(playerHand, playerHandDiv, false, onPlayerCardClick);
-  renderDeck();
-  gameLogDiv.textContent = `Вы взяли карту ${card.rank}${card.suit} из колоды.`;
-});
-
-// Кнопка старт игры
-startBtn.addEventListener('click', () => {
-  startGame();
-});
+startBtn.addEventListener('click', startGame);
