@@ -1,106 +1,213 @@
+/* Общие стили */
 body {
+  margin: 0; padding: 0;
+  background: linear-gradient(135deg, #1c2833, #39525c);
+  color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #2c3e50;
-  color: #ecf0f1;
   display: flex;
   justify-content: center;
-  padding: 20px;
+  min-height: 100vh;
+  align-items: center;
+  user-select: none;
 }
 
 #game-container {
-  max-width: 480px;
-  width: 100%;
+  width: 480px;
   text-align: center;
-  user-select: none;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-.hand {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
-  gap: 8px;
-  min-height: 100px;
+/* Кнопка */
+button {
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #2ecc71;
+  color: white;
+  margin-bottom: 15px;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: #27ae60;
 }
 
-.top-hand {
-  flex-wrap: nowrap;
-  transform: translateY(0);
-}
-
-.bottom-hand {
-  flex-wrap: nowrap;
-  transform: translateY(0);
+/* Колода и козырь */
+#trump-container {
+  position: relative;
+  width: 70px;
+  height: 120px;
+  margin: 0 auto 15px auto;
 }
 
 .card {
+  width: 70px;
+  height: 100px;
+  border-radius: 8px;
   background: white;
-  border-radius: 6px;
-  width: 50px;
-  height: 70px;
+  color: black;
+  font-weight: 700;
+  font-size: 26px;
+  box-shadow: 0 4px 7px rgba(0,0,0,0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
-  font-size: 20px;
-  color: black;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  cursor: pointer;
-  transition: transform 0.2s ease;
   user-select: none;
+  position: absolute;
+  top: 0; left: 0;
+  transition: all 0.5s ease;
 }
 
 .card.red {
-  color: red;
+  color: #e74c3c;
 }
 
-.card:hover {
-  transform: translateY(-10px);
+.card.back {
+  background: linear-gradient(45deg, #34495e, #2c3e50);
+  color: transparent;
+  box-shadow: inset 0 0 20px #0008;
+  cursor: default;
 }
 
+/* Колода и козырь рядом */
+#deck {
+  z-index: 10;
+  cursor: pointer;
+}
+
+#trump-card {
+  top: 20px;
+  left: 20px;
+  transform: rotate(10deg);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.6);
+  z-index: 5;
+}
+
+/* Стол */
 #battlefield {
-  min-height: 120px;
+  min-height: 140px;
+  position: relative;
+  margin-bottom: 15px;
   display: flex;
   justify-content: center;
-  gap: 40px;
-  margin: 20px 0;
-  position: relative;
+  gap: 70px;
+  flex-wrap: nowrap;
 }
 
+/* Карты на столе (пары: атакующая и отбивающаяся) */
+.battle-pair {
+  position: relative;
+  width: 70px;
+  height: 130px;
+}
+
+/* Карты атакующего и отбивающегося */
 .battle-card {
-  width: 50px;
-  height: 70px;
-  border-radius: 6px;
+  position: absolute;
+  width: 70px;
+  height: 100px;
+  border-radius: 8px;
   background: white;
+  font-weight: 700;
+  font-size: 26px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
-  font-size: 20px;
+  box-shadow: 0 4px 7px rgba(0,0,0,0.4);
   color: black;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  position: relative;
+  user-select: none;
+  transition: all 0.4s ease;
 }
 
 .battle-card.red {
-  color: red;
+  color: #e74c3c;
 }
 
-.move-up {
-  animation: moveUp 0.4s ease forwards;
+.battle-card.defense {
+  top: 30px;
+  left: 5px;
+  transform: rotate(5deg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
 }
 
-@keyframes moveUp {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-50px); opacity: 1; }
+/* Руки игроков */
+.hand {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  min-height: 110px;
+  padding: 5px 0;
+  user-select: none;
 }
 
-#trump-suit {
-  font-size: 22px;
-  margin: 15px 0;
+.top-hand {
+  margin-bottom: 20px;
 }
 
+.bottom-hand {
+  margin-top: 10px;
+}
+
+.hand .card {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.hand .card.red {
+  color: #e74c3c;
+}
+
+.hand .card:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 7px 14px rgba(0,0,0,0.6);
+}
+
+/* Лог */
 #game-log {
   min-height: 30px;
-  margin-top: 15px;
+  font-size: 16px;
   font-weight: 600;
+  margin-top: 10px;
+  color: #ecf0f1;
+}
+
+/* Анимация перемещения карты (для раздачи) */
+.move-card {
+  position: absolute;
+  width: 70px;
+  height: 100px;
+  border-radius: 8px;
+  background: white;
+  font-weight: 700;
+  font-size: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 7px rgba(0,0,0,0.4);
+  color: black;
+  pointer-events: none;
+  z-index: 100;
+  transition: all 0.6s ease;
+}
+
+.move-card.red {
+  color: #e74c3c;
+}
+
+/* Выделение карты при активном выборе */
+.card.active {
+  outline: 3px solid #2ecc71;
+  outline-offset: -6px;
+}
+
+/* Отключение клика для руки */
+.hand.disabled .card {
+  cursor: default;
+  opacity: 0.6;
+  pointer-events: none;
+  transform: none !important;
 }
