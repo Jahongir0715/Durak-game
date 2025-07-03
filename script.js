@@ -4,12 +4,13 @@ const botHandDiv = document.getElementById('bot-hand');
 const trumpSuitDiv = document.getElementById('trump-suit');
 const gameLogDiv = document.getElementById('game-log');
 const startBtn = document.getElementById('start-game-btn');
-const botMoveDiv = document.getElementById('bot-move');
+const battlefieldDiv = document.getElementById('battlefield');
 
 // === Данные игры ===
 const suits = ['♠', '♥', '♦', '♣'];
 const ranks = ['6','7','8','9','10','J','Q','K','A'];
 let deck = [], playerHand = [], botHand = [], trumpCard = {}, trumpSuit = '';
+let battlefieldCards = [];  // карты на столе (ход)
 
 // === Функции ===
 
@@ -39,6 +40,32 @@ function renderHand(hand, container, hide = false, clickHandler = null) {
   });
 }
 
+// Отрисовка стола (хода)
+function renderBattlefield() {
+  battlefieldDiv.innerHTML = '';
+  battlefieldCards.forEach(pair => {
+    const attackEl = document.createElement('div');
+    attackEl.className = 'card attack';
+    attackEl.textContent = pair.attack.rank + pair.attack.suit;
+    battlefieldDiv.appendChild(attackEl);
+    if (pair.defense) {
+      const defendEl = document.createElement('div');
+      defendEl.className = 'card defense';
+      defendEl.textContent = pair.defense.rank + pair.defense.suit;
+      battlefieldDiv.appendChild(defendEl);
+    }
+  });
+}
+
+// Проверка, может ли карта защитить другую
+function canBeat(attackCard, defenseCard) {
+  if (defenseCard.suit === trumpSuit && attackCard.suit !== trumpSuit) return true;
+  if (defenseCard.suit === attackCard.suit) {
+    return ranks.indexOf(defenseCard.rank) > ranks.indexOf(attackCard.rank);
+  }
+  return false;
+}
+
 // Старт игры
 function startGame() {
   deck = createDeck();
@@ -48,94 +75,46 @@ function startGame() {
   trumpCard = deck[deck.length - 1];
   trumpSuit = trumpCard.suit;
 
+  battlefieldCards = [];
+
   trumpSuitDiv.textContent = `Козырь: ${trumpCard.rank}${trumpCard.suit}`;
   renderHand(playerHand, playerHandDiv, false, playerPlayCard);
   renderHand(botHand, botHandDiv, true);
-  botMoveDiv.innerHTML = '';
+  renderBattlefield();
   gameLogDiv.textContent = 'Игра началась! Ваш ход.';
 }
 
-// Ход игрока
-function playerPlayCard(index) {
-  const card = playerHand.splice(index, 1)[0];
-  renderHand(playerHand, playerHandDiv, false, playerPlayCard);
-  gameLogDiv.textContent = `Вы походили: ${card.rank}${card.suit}. Бот думает...`;
-  setTimeout(() => botPlay(card), 1000);
-}
-
-// Ход бота
-function botPlay(playerCard) {
-  const botCard = botHand.shift();
-  renderHand(botHand, botHandDiv, true);
-
-  // Показываем карту хода бота
-  botMoveDiv.innerHTML = '';
-  const botCardElem = document.createElement('div');
-  botCardElem.className = 'card';
-  botCardElem.textContent = botCard.rank + botCard.suit;
-  botMoveDiv.appendChild(botCardElem);
-
-  gameLogDiv.textContent = `Бот ответил: ${botCard.rank}${botCard.suit}. Ваш ход снова.`;
-}
-
-// Кнопка запуска
-startBtn.onclick = startGame;
-const battlefieldDiv = document.getElementById('battlefield');
-
-let battlefieldCards = [];  // карты, на столе сейчас
-function renderBattlefield() {
-  battlefieldDiv.innerHTML = '';
-  battlefieldCards.forEach(card => {
-    const el = document.createElement('div');
-    el.className = 'card';
-    el.textContent = card.rank + card.suit;
-    battlefieldDiv.appendChild(el);
-  });
-}
+// Ход игрока (атака)
 function playerPlayCard(index) {
   const card = playerHand.splice(index, 1)[0];
   battlefieldCards.push({ attack: card, defense: null });
   renderBattlefield();
-  renderHand(playerHand, playerHandDiv, false, null); // убираем выбор карт пока бот ходит
+  renderHand(playerHand, playerHandDiv, false, null);
   gameLogDiv.textContent = `Вы походили: ${card.rank}${card.suit}. Ход бота...`;
   setTimeout(() => botDefend(), 1000);
 }
-function canBeat(attackCard, defenseCard) {
-  // Возвращает true, если defenseCard бьет attackCard
 
-  // если defenseCard козырь, а attackCard нет — побеждает
-  if (defenseCard.suit === trumpSuit && attackCard.suit !== trumpSuit) return true;
-
-  // если масти совпадают — сравниваем ранги
-  if (defenseCard.suit === attackCard.suit) {
-    return ranks.indexOf(defenseCard.rank) > ranks.indexOf(attackCard.rank);
-  }
-
-  return false;
-}
-
+// Ход бота (защита)
 function botDefend() {
-  // Бот ищет карту для защиты
   for (let i = 0; i < botHand.length; i++) {
     if (canBeat(battlefieldCards[0].attack, botHand[i])) {
       battlefieldCards[0].defense = botHand.splice(i, 1)[0];
       renderBattlefield();
       renderHand(botHand, botHandDiv, true);
-      gameLogDiv.textContent = `Бот побил карту. Ваш ход — подкидывайте карту или заканчивайте ход.`;
-      // Тут дальше будет логика подкидывания или окончания хода
-      playerCanThrow = true; // флаг для подкидывания, добавим позже
-      renderHand(playerHand, playerHandDiv, false, playerThrowCard);
+      gameLogDiv.textContent = `Бот побил карту. Ваш ход снова.`;
+      renderHand(playerHand, playerHandDiv, false, playerPlayCard);
       return;
     }
   }
-  // Если защититься не может
+  // Бот не может побить
   gameLogDiv.textContent = `Бот не может побить — он забирает карты. Ваш ход снова.`;
   botHand = botHand.concat(battlefieldCards.map(c => c.attack));
-  if (battlefieldCards.some(c => c.defense)) {
-    botHand = botHand.concat(battlefieldCards.filter(c => c.defense).map(c => c.defense));
-  }
+  battlefieldCards.forEach(c => { if (c.defense) botHand.push(c.defense); });
   battlefieldCards = [];
   renderBattlefield();
   renderHand(botHand, botHandDiv, true);
   renderHand(playerHand, playerHandDiv, false, playerPlayCard);
 }
+
+// Кнопка запуска
+startBtn.onclick = startGame;
