@@ -92,3 +92,11 @@ function renderBattlefield() {
     battlefieldDiv.appendChild(el);
   });
 }
+function playerPlayCard(index) {
+  const card = playerHand.splice(index, 1)[0];
+  battlefieldCards.push({ attack: card, defense: null });
+  renderBattlefield();
+  renderHand(playerHand, playerHandDiv, false, null); // убираем выбор карт пока бот ходит
+  gameLogDiv.textContent = `Вы походили: ${card.rank}${card.suit}. Ход бота...`;
+  setTimeout(() => botDefend(), 1000);
+}
