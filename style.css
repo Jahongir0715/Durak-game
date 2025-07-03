@@ -87,3 +87,46 @@ body {
 .table-pair .card {
   margin: 3px 0;
 }
+body {
+  font-family: Arial, sans-serif;
+  background: #0b3d91;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+#game-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card {
+  display: inline-block;
+  border: 1px solid white;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin: 5px;
+  font-size: 24px;
+  background: #2153b1;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s;
+}
+
+.card:hover {
+  background-color: #4169e1;
+}
+
+.bot-card {
+  background: #00000088; /* закрытые карты бота */
+}
+
+.table-pair {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.table-pair .card {
+  margin: 0 5px;
+}
