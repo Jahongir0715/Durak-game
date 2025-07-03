@@ -230,4 +230,16 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Сервер запущен: http://localhost:${PORT}`);
 });
+const socket = io();
+
+socket.on('connect', () => {
+  console.log('Connected to server, id: ' + socket.id);
+});
+
+socket.on('chat message', (msg) => {
+  console.log('New message:', msg);
+});
+
+// Для теста отправим сообщение
+socket.emit('chat message', 'Привет от клиента ' + socket.id);
 
