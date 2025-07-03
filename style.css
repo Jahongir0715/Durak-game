@@ -211,3 +211,41 @@ button:hover {
   pointer-events: none;
   transform: none !important;
 }
+.battle-pair {
+  position: relative;
+  margin-bottom: 10px;
+  width: 80px;
+  height: 120px;
+}
+
+.attack-card, .defense-card {
+  position: absolute;
+  width: 80px;
+  height: 120px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 120px;
+  font-size: 30px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  background: white;
+}
+
+.attack-card {
+  top: 0;
+  left: 0;
+  z-index: 2;
+  border: 2px solid green;
+}
+
+.defense-card {
+  top: -20px;
+  left: 10px;
+  z-index: 1;
+  border: 2px solid red;
+  opacity: 0.9;
+}
+
+.red {
+  color: red;
+}
