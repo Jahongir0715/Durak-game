@@ -66,3 +66,18 @@ function startGame() {
 
 // Слушатель кнопки
 startGameBtn.addEventListener('click', startGame);
+function renderHand(hand, container, hideCards = false, isPlayer = false) {
+  container.innerHTML = '';
+  hand.forEach((card, index) => {
+    const cardElem = document.createElement('div');
+    cardElem.className = 'card';
+    cardElem.textContent = hideCards ? '🂠' : card.rank + card.suit;
+
+    if (isPlayer && !hideCards) {
+      cardElem.style.cursor = 'pointer';
+      cardElem.addEventListener('click', () => playerPlayCard(index));
+    }
+
+    container.appendChild(cardElem);
+  });
+}
