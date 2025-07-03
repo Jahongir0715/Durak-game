@@ -80,3 +80,6 @@ function botPlay(playerCard) {
 
 // Кнопка запуска
 startBtn.onclick = startGame;
+const battlefieldDiv = document.getElementById('battlefield');
+
+let battlefieldCards = [];  // карты, на столе сейчас
